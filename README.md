@@ -17,4 +17,4 @@ yarn build
 
 to bundle your application
 
-https://frontend-project-11-gilt.vercel.app/ - получавшийся сайт
+https://frontend-project-11-gilt.vercel.app/ - получившийся сайт
