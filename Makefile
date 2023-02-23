@@ -14,3 +14,6 @@ lint:
 	npx eslint .
 
 .PHONY: test
+
+run: 
+	npm run build
