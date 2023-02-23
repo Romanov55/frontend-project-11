@@ -1,4 +1,18 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"/><title>Webpack App</title><script defer="defer" src="main.js"></script></head><body><h1>Hello world!</h1><h2>Tip: Check your console</h2></body><script>if ("serviceWorker" in navigator) {
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta charset="utf-8"/>
+        <title>Webpack App</title>
+        <script defer="defer" src="main.js"></script>
+    </head>
+    <body>
+        <form action="">
+            <input type="text" placeholder="Ссылка RSS">
+            <button type="button">Добавить</button>
+        </form>
+    </body>
+    <script>if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker
                     .register("service-worker.js")
@@ -9,4 +23,5 @@
                         console.error("Service Worker registration failed: ", registrationError);
                     });
             });
-        }</script></html>
+    }</script>
+</html>
