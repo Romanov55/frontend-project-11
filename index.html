@@ -6,13 +6,32 @@
         <title>Webpack App</title>
     </head>
     <body>
-        <form action="">
-            <input type="text" placeholder="Ссылка RSS">
-            <button type="button">Добавить</button>
-        </form>
+        <main>
+            <section>
+                <div>
+                    <div>
+                        <h1>RSS агрегатор</h1>
+                        <p class="lead">Начните читать RSS сегодня! Это легко, это красиво.</p>
+                        <form action class="rss-form text-body">
+                            <div class="row">
+                                <div class="col">
+                                    <input id="url-input"type="text" autofocus required name="url" aria-label="url" class="form-control w-100" placeholder="Ссылка RSS" autocomplete="off">
+                                    <label for="url-input"></label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" aria-label="add" class="h-100">Добавить</button>
+                            </div>
+                        </form>
+                        <p>Пример: https://ru.hexlet.io/lessons.rss</p>
+                        <p class="feedback"></p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </body>
     
-    <script>
+    <script type="module" src="/src/valid.js" crossorigin="">
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker

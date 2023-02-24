@@ -3,13 +3,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const isProduction = process.env.NODE_ENV == 'production';
-
-
 const config = {
     mode: 'development',
     entry: './src/index.js',
     output: {
+        filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
     },
     devServer: {
@@ -29,6 +27,26 @@ const config = {
             {
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
                 type: 'asset',
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                    },
+                },
+            },
+            {
+                test: /\.js$/,
+                include: /node_modules\/yup/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                    },
+                },
             },
             //     { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
             // {
