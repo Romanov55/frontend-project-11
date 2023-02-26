@@ -48,11 +48,11 @@ const config = {
                     },
                 },
             },
-            //     { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
-            // {
-            //     test: /\.scss$/,
-            //     use: ['style-loader', 'css-loader', 'sass-loader', 'postcss-loader'],
-            // },
+                { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
+            {
+                test: /\.scss$/,
+                use: ['style-loader', 'css-loader', 'sass-loader', 'postcss-loader'],
+            },
 
             // Add your rules for custom modules here
             // Learn more about loaders from https://webpack.js.org/loaders/
@@ -66,6 +66,6 @@ module.exports = {...config,
       directory: path.join(__dirname, 'public'),
     },
     compress: true,
-    port: 9000,
+    port: 8080,
   },
 };
