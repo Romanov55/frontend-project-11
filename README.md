@@ -20,7 +20,7 @@ $ make lint
 
 ## Start
 ```sh
-$ make develop
+$ make dev
 ```
 ## Technologies used in the project:
 -Webpack
