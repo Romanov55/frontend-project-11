@@ -2,9 +2,9 @@ import i18next from 'i18next';
 import _ from 'lodash';
 import axios from 'axios';
 import * as yup from 'yup';
-import ru from './locales/ru.js';
-import view from './view.js';
-import parse from './parser.js';
+import ru from './locales/ru';
+import view from './view';
+import parse from './parser';
 
 const timeOut = 5000;
 
@@ -14,7 +14,7 @@ const setIds = (data) => {
   const feed = { feedId, title, description };
   const posts = data.posts.map((post) => ({ feedId, id: _.uniqueId(), ...post }));
   return { feed, posts };
-}
+};
 
 const generateURL = (link) => {
   const url = new URL('https://allorigins.hexlet.app/get');
@@ -119,9 +119,6 @@ export default () => {
                 state.posts.unshift(...currentNewPosts);
                 state.status = 'finished';
               }
-            })
-            .catch((err) => {
-              console.log(new Error(err.message));
             }));
         Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
       };
