@@ -2,11 +2,12 @@ import i18next from 'i18next';
 import _ from 'lodash';
 import axios from 'axios';
 import * as yup from 'yup';
-import ru from './locales/ru';
+import resources from './locales';
 import view from './view';
 import parse from './parser';
 
 const timeOut = 5000;
+const defaultLanguage = 'ru';
 
 const setIds = (data) => {
   const feedId = _.uniqueId();
@@ -40,16 +41,6 @@ const handleError = (error) => {
 };
 
 export default () => {
-  yup.setLocale({
-    mixed: {
-      notOneOf: () => ({ key: 'duplicate' }),
-      required: () => ({ key: 'required' }),
-    },
-    string: {
-      url: () => ({ key: 'invalidUrl' }),
-    },
-  });
-
   const intialState = {
     status: 'intial',
     error: null,
@@ -63,10 +54,19 @@ export default () => {
 
   const i18nextInstance = i18next.createInstance();
   i18nextInstance.init({
-    lng: 'ru',
-    resources: { ru },
+    lng: defaultLanguage,
+    resources,
   })
     .then(() => {
+      yup.setLocale({
+        mixed: {
+          notOneOf: () => ({ key: 'duplicate' }),
+          required: () => ({ key: 'required' }),
+        },
+        string: {
+          url: () => ({ key: 'invalidUrl' }),
+        },
+      })
       const state = view(intialState, i18nextInstance);
       const makeSchema = (validatedLinks) => yup.string()
         .required()
@@ -104,7 +104,6 @@ export default () => {
         if (!id) return;
         state.readPostsIds.add(id);
         state.modalPost.postId = id;
-        state.status = 'finished';
       });
 
       const checkForNewPosts = () => {
@@ -117,7 +116,6 @@ export default () => {
                 .map((post) => ({ feedId, id: _.uniqueId, ...post }));
               if (currentNewPosts.length > 0) {
                 state.posts.unshift(...currentNewPosts);
-                state.status = 'finished';
               }
             }));
         Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
