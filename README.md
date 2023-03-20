@@ -4,6 +4,10 @@
 
 ### RSS-Agregator
 This is a service for aggregating RSS feeds, with which it is convenient to read a variety of sources, such as blogs. It allows you to add an unlimited number of RSS feeds, updates them itself and adds new entries to the general feed.
+
+### Link app
+https://frontend-project-11-4rvahg9lv-romanov55.vercel.app/
+
 ## Setup
 ```sh
 $ make install
