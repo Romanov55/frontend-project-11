@@ -155,6 +155,8 @@ export default (state, i18nInstance) => {
       case 'status':
         renderValue(value, watchedState);
         break;
+      default:
+        break;
     }
   });
   return watchedState;
