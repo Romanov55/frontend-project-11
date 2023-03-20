@@ -44,8 +44,10 @@ export default () => {
   const intialState = {
     status: 'intial',
     error: null,
-    feeds: [],
-    posts: [],
+    data: {
+      feeds: [],
+      posts: [],
+    },
     readPostsIds: new Set(),
     modalPost: {
       postId: '',
@@ -66,7 +68,7 @@ export default () => {
         string: {
           url: () => ({ key: 'invalidUrl' }),
         },
-      })
+      });
       const state = view(intialState, i18nextInstance);
       const makeSchema = (validatedLinks) => yup.string()
         .required()
@@ -76,7 +78,7 @@ export default () => {
       const form = document.querySelector('form.rss-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const links = state.feeds.map((feed) => feed.link);
+        const links = state.data.feeds.map((feed) => feed.link);
         const schema = makeSchema(links);
         const formData = new FormData(e.target);
         const inputURL = formData.get('url').trim();
@@ -87,9 +89,9 @@ export default () => {
             return getFeedsPosts(inputURL);
           })
           .then((normalizedData) => {
-            state.feeds.unshift(normalizedData.feed);
-            state.feeds[0].link = inputURL;
-            state.posts.unshift(...normalizedData.posts);
+            state.data.feeds.unshift(normalizedData.feed);
+            state.data.feeds[0].link = inputURL;
+            state.data.posts.unshift(...normalizedData.posts);
             state.status = 'finished';
           })
           .catch((error) => {
@@ -104,21 +106,28 @@ export default () => {
         if (!id) return;
         state.readPostsIds.add(id);
         state.modalPost.postId = id;
+        // state.status = 'finished';
       });
 
       const checkForNewPosts = () => {
-        const promises = state.feeds
+        let result = [];
+        const promises = state.data.feeds
           .map((feed, index) => getFeedsPosts(feed.link)
             .then((response) => {
-              const { feedId } = state.feeds[index];
-              const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
+              const { feedId } = state.data.feeds[index];
+              const filteredPosts = state.data.posts.filter((post) => post.feedId === feedId);
               const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
                 .map((post) => ({ feedId, id: _.uniqueId, ...post }));
               if (currentNewPosts.length > 0) {
-                state.posts.unshift(...currentNewPosts);
+                state.data.posts.unshift(...currentNewPosts);
+                // state.status = 'finished';
               }
+              result = [...promises];
+            })
+            .catch((err) => {
+              console.log(new Error(err.message));
             }));
-        Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
+        Promise.all(result).finally(() => setTimeout(checkForNewPosts, timeOut));
       };
       checkForNewPosts();
     });

@@ -25,7 +25,7 @@ export default (state, i18nInstance) => {
     card.append(cardBody);
     const ul = document.createElement('ul');
     ul.classList.add('list-group', 'border-0', 'rounded-0');
-    const postsElements = state.posts.map((post) => {
+    const postsElements = state.data.posts.map((post) => {
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'aling-items-start', 'border-0', 'border-end-0');
       const a = document.createElement('a');
@@ -66,7 +66,7 @@ export default (state, i18nInstance) => {
     card.append(cardBody);
     const ul = document.createElement('ul');
     ul.classList.add('list-group', 'border-0', 'rounded-0');
-    const feedsElements = state.feeds.map((feed) => {
+    const feedsElements = state.data.feeds.map((feed) => {
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'border-0', 'border-end-0');
       const h3 = document.createElement('h3');
@@ -83,32 +83,64 @@ export default (state, i18nInstance) => {
     elements.feeds.append(card);
   };
 
+  const renderModalPosts = (watchedState) => {
+    const posts = [...state.data.posts];
+    const elementId = state.modalPost.postId;
+    const { title, description, link } = posts.filter((item) => item.id === elementId)[0];
+    elements.modalTitle.textContent = title;
+    elements.modalBody.textContent = description;
+    elements.modalLink.setAttribute('href', link);
+    elements.form.reset();
+    elements.input.focus();
+    elements.input.classList.remove('is-invalid');
+    elements.button.classList.remove('disabled');
+    elements.outputText.textContent = i18nInstance.t('success');
+    elements.outputText.classList.remove('text-danger');
+    elements.outputText.classList.add('text-success');
+    elements.posts.innerHTML = '';
+    elements.feeds.innerHTML = '';
+    renderPosts(watchedState, elements);
+    renderFeeds(watchedState, elements);
+  };
+
+  const renderFailedValue = (watchedState) => {
+    elements.input.focus();
+    elements.input.classList.add('is-invalid');
+    elements.button.classList.remove('disabled');
+    elements.outputText.textContent = i18nInstance.t(watchedState.error);
+    elements.outputText.classList.remove('text-success');
+    elements.outputText.classList.add('text-danger');
+  };
+
+  const renderProcessingValue = () => {
+    elements.outputText.textContent = '';
+    elements.button.classList.add('disabled');
+  };
+
+  const renderFinishedValue = (watchedState) => {
+    elements.form.reset();
+    elements.input.focus();
+    elements.input.classList.remove('is-invalid');
+    elements.button.classList.remove('disabled');
+    elements.outputText.textContent = i18nInstance.t('success');
+    elements.outputText.classList.remove('text-danger');
+    elements.outputText.classList.add('text-success');
+    elements.posts.innerHTML = '';
+    elements.feeds.innerHTML = '';
+    renderPosts(watchedState, elements);
+    renderFeeds(watchedState, elements);
+  };
+
   const renderValue = (value, watchedState) => {
     switch (value) {
       case 'failed':
-        elements.input.focus();
-        elements.input.classList.add('is-invalid');
-        elements.button.classList.remove('disabled');
-        elements.outputText.textContent = i18nInstance.t(watchedState.error);
-        elements.outputText.classList.remove('text-success');
-        elements.outputText.classList.add('text-danger');
+        renderFailedValue(watchedState);
         break;
       case 'processing':
-        elements.outputText.textContent = '';
-        elements.button.classList.add('disabled');
+        renderProcessingValue();
         break;
       case 'finished':
-        elements.form.reset();
-        elements.input.focus();
-        elements.input.classList.remove('is-invalid');
-        elements.button.classList.remove('disabled');
-        elements.outputText.textContent = i18nInstance.t('success');
-        elements.outputText.classList.remove('text-danger');
-        elements.outputText.classList.add('text-success');
-        elements.posts.innerHTML = '';
-        elements.feeds.innerHTML = '';
-        renderPosts(watchedState, elements);
-        renderFeeds(watchedState, elements);
+        renderFinishedValue(watchedState);
         break;
       default:
         throw new Error(`Unknown state:${value}`);
@@ -116,25 +148,13 @@ export default (state, i18nInstance) => {
   };
 
   const watchedState = onChange(state, (path, value) => {
-    if (path === 'modalPost.postId') {
-      const elementId = state.modalPost.postId;
-      const { title, description, link } = state.posts.filter((item) => item.id === elementId)[0];
-      elements.modalTitle.textContent = title;
-      elements.modalBody.textContent = description;
-      elements.modalLink.setAttribute('href', link);
-      elements.form.reset();
-      elements.input.focus();
-      elements.input.classList.remove('is-invalid');
-      elements.button.classList.remove('disabled');
-      elements.outputText.textContent = i18nInstance.t('success');
-      elements.outputText.classList.remove('text-danger');
-      elements.outputText.classList.add('text-success');
-      elements.posts.innerHTML = '';
-      elements.feeds.innerHTML = '';
-      renderPosts(watchedState, elements);
-      renderFeeds(watchedState, elements);
-    } else if (path === 'status') {
-      renderValue(value, watchedState);
+    switch (path) {
+      case 'modalPost.postId':
+        renderModalPosts(watchedState);
+        break;
+      case 'status':
+        renderValue(value, watchedState);
+        break;
     }
   });
   return watchedState;
