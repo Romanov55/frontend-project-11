@@ -9,11 +9,15 @@ import parse from './parser';
 const timeOut = 5000;
 const defaultLanguage = 'ru';
 
+const getPosts = (data, feedId) => {
+  return data.map((post) => ({ feedId, id: _.uniqueId(), ...post }))
+}
+
 const setIds = (data) => {
   const feedId = _.uniqueId();
   const { title, description } = data.feed;
   const feed = { feedId, title, description };
-  const posts = data.posts.map((post) => ({ feedId, id: _.uniqueId(), ...post }));
+  const posts = getPosts(data.posts, feedId)
   return { feed, posts };
 };
 
@@ -118,8 +122,7 @@ export default () => {
             .then((response) => {
               const { feedId } = state.data.feeds[index];
               const filteredPosts = state.data.posts.filter((post) => post.feedId === feedId);
-              const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
-                .map((post) => ({ feedId, id: _.uniqueId, ...post }));
+              const currentNewPosts = getPosts(_.differenceBy(response.posts, filteredPosts, 'title'));
               if (currentNewPosts.length > 0) {
                 state.data.posts.unshift(...currentNewPosts);
               }
