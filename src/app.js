@@ -41,7 +41,12 @@ const handleError = (error) => {
 };
 
 export default () => {
-  const intialState = {
+  const elements = {
+    form: document.querySelector('form.rss-form'),
+    postsContainer: document.querySelector('.posts'),
+  };
+
+  const initialState = {
     status: 'intial',
     error: null,
     data: {
@@ -69,14 +74,13 @@ export default () => {
           url: () => ({ key: 'invalidUrl' }),
         },
       });
-      const state = view(intialState, i18nextInstance);
+      const state = view(initialState, i18nextInstance);
       const makeSchema = (validatedLinks) => yup.string()
         .required()
         .url()
         .notOneOf(validatedLinks);
 
-      const form = document.querySelector('form.rss-form');
-      form.addEventListener('submit', (e) => {
+      elements.form.addEventListener('submit', (e) => {
         e.preventDefault();
         const links = state.data.feeds.map((feed) => feed.link);
         const schema = makeSchema(links);
@@ -100,19 +104,17 @@ export default () => {
           });
       });
 
-      const postsContainer = document.querySelector('.posts');
-      postsContainer.addEventListener('click', (e) => {
+      elements.postsContainer.addEventListener('click', (e) => {
         const { id } = e.target.dataset;
         if (!id) return;
         state.readPostsIds.add(id);
         state.modalPost.postId = id;
-        // state.status = 'finished';
       });
 
       const checkForNewPosts = () => {
-        let result = [];
         const promises = state.data.feeds
           .map((feed, index) => getFeedsPosts(feed.link)
+            .catch(() => null)
             .then((response) => {
               const { feedId } = state.data.feeds[index];
               const filteredPosts = state.data.posts.filter((post) => post.feedId === feedId);
@@ -120,14 +122,9 @@ export default () => {
                 .map((post) => ({ feedId, id: _.uniqueId, ...post }));
               if (currentNewPosts.length > 0) {
                 state.data.posts.unshift(...currentNewPosts);
-                // state.status = 'finished';
               }
-              result = [...promises];
-            })
-            .catch((err) => {
-              console.log(new Error(err.message));
             }));
-        Promise.all(result).finally(() => setTimeout(checkForNewPosts, timeOut));
+        Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
       };
       checkForNewPosts();
     });
