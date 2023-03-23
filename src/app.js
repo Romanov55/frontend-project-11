@@ -9,15 +9,11 @@ import parse from './parser';
 const timeOut = 5000;
 const defaultLanguage = 'ru';
 
-const getPosts = (data, feedId) => {
-  return data.map((post) => ({ feedId, id: _.uniqueId(), ...post }))
-}
-
 const setIds = (data) => {
   const feedId = _.uniqueId();
   const { title, description } = data.feed;
   const feed = { feedId, title, description };
-  const posts = getPosts(data.posts, feedId)
+  const posts = data.posts.map((post) => ({ feedId, id: _.uniqueId(), ...post }));
   return { feed, posts };
 };
 
@@ -51,8 +47,10 @@ export default () => {
   };
 
   const initialState = {
-    status: 'intial',
-    error: null,
+    form: {
+      status: 'intial',
+      error: null,
+    },
     data: {
       feeds: [],
       posts: [],
@@ -92,19 +90,19 @@ export default () => {
         const inputURL = formData.get('url').trim();
         schema.validate(inputURL)
           .then(() => {
-            state.status = 'processing';
-            state.error = null;
+            state.form.status = 'processing';
+            state.form.error = null;
             return getFeedsPosts(inputURL);
           })
           .then((normalizedData) => {
             state.data.feeds.unshift(normalizedData.feed);
             state.data.feeds[0].link = inputURL;
             state.data.posts.unshift(...normalizedData.posts);
-            state.status = 'finished';
+            state.form.status = 'finished';
           })
           .catch((error) => {
-            state.error = handleError(error);
-            state.status = 'failed';
+            state.form.error = handleError(error);
+            state.form.status = 'failed';
           });
       });
 
@@ -122,7 +120,8 @@ export default () => {
             .then((response) => {
               const { feedId } = state.data.feeds[index];
               const filteredPosts = state.data.posts.filter((post) => post.feedId === feedId);
-              const currentNewPosts = getPosts(_.differenceBy(response.posts, filteredPosts, 'title'));
+              const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
+                .map((post) => ({ feedId, id: _.uniqueId, ...post }));
               if (currentNewPosts.length > 0) {
                 state.data.posts.unshift(...currentNewPosts);
               }

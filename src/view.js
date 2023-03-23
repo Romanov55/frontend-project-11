@@ -107,7 +107,7 @@ export default (state, i18nInstance) => {
     elements.input.focus();
     elements.input.classList.add('is-invalid');
     elements.button.classList.remove('disabled');
-    elements.outputText.textContent = i18nInstance.t(watchedState.error);
+    elements.outputText.textContent = i18nInstance.t(watchedState.form.error);
     elements.outputText.classList.remove('text-success');
     elements.outputText.classList.add('text-danger');
   };
@@ -152,7 +152,7 @@ export default (state, i18nInstance) => {
       case 'modalPost.postId':
         renderModalPosts(watchedState);
         break;
-      case 'status':
+      case 'form.status':
         renderValue(value, watchedState);
         break;
       default:
